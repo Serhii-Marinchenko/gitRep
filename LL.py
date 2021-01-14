@@ -13,7 +13,7 @@ class Node:
     self.next_node = next_node
 
 
-# Our LinkedList class
+LinkedList class
 class LinkedList:
   def __init__(self, value=None):
     self.head_node = Node(value)
@@ -21,7 +21,7 @@ class LinkedList:
   def get_head_node(self):
     return self.head_node
   
-# Add your insert_beginning and stringify_list methods below:
+
   def insert_beginning(self, new_value):
     new_node = Node(new_value, self.head_node)
     self.head_node = new_node
