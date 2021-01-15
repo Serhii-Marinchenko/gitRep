@@ -1,5 +1,80 @@
 # Linear data structures implementation in Python
 
+#Define helper superclass
+class aux:
+    def tl(arr):
+        return arr[1:]
+    
+    def hd(arr):
+        return arr[0]
+    
+    def curry(f):
+        curried = lambda x: lambda y: f(x, y)
+        return curried
+    
+    def getNodesVals(self, node, acc):
+        acc.append(str(node.get_value()))
+        next_node = node.get_next_node()
+        if (next_node == None):
+            return acc
+        else:
+            return self.getNodesVals(next_node, acc)
+        
+    def swap_nodes(self, input_list, val1, val2):
+        print(f'Swapping {val1} with {val2}')
+        
+        node1_prev = None
+        node2_prev = None
+        node1 = input_list.head_node
+        node2 = input_list.head_node
+        
+        if val1 == val2:
+            print("Elements are the same - no swap needed")
+            return
+        
+        while node1 is not None:
+            if node1.get_value() == val1:
+                break
+            node1_prev = node1
+            node1 = node1.get_next_node()
+            
+        while node2 is not None:
+            if node2.get_value() == val2:
+                break
+            node2_prev = node2
+            node2 = node2.get_next_node()
+      
+        if (node1 is None or node2 is None):
+            print("Swap not possible - one or more element is not in the list")
+            return
+        
+        if node1_prev is None:
+            self.head_node = node2
+        else:
+            node1_prev.set_next_node(node2)
+            
+            if node2_prev is None:
+                input_list.head_node = node1
+            else:
+                node2_prev.set_next_node(node1)
+                
+            temp = node1.get_next_node()
+            node1.set_next_node(node2.get_next_node())
+            node2.set_next_node(temp)
+            
+    def linear_search(self, search_list, target_value):
+        def f(lst, i):
+            if self.hd(lst) == target_value:
+                return i
+            else:
+                return f(self.tl(lst), i+1)
+        try:
+            ans = f(search_list, 0)
+        except:
+            ans = "{0} not in list".format(target_value)
+        return ans
+
+
 # Nodes 
 class Node:
     def __init__(self, value, next_node=None):
@@ -16,7 +91,7 @@ class Node:
         self.next_node = next_node
 
 
-class LinkedList:
+class LinkedList(aux):
     def __init__(self, value=None):
         self.head_node = Node(value)
   
@@ -27,21 +102,13 @@ class LinkedList:
         new_node = Node(new_value, self.head_node)
         self.head_node = new_node
     
-    def aux(self, node, acc):
-        acc.append(str(node.get_value()))
-        next_node = node.get_next_node()
-        if (next_node is None):
-            return acc
-        else:
-            return self.aux(next_node, acc)
-        
     def stringify_list(self):
         head_node = self.get_head_node()
-        acc = self.aux(head_node, [])
+        acc = super().getNodesVals(head_node, [])
         s = '\n'.join(acc)
         return s
 
-  
+
 # Test
 ll = LinkedList(5)
 ll.insert_beginning(70)
@@ -49,6 +116,13 @@ ll.insert_beginning(5675)
 ll.insert_beginning(90)
 print(ll.stringify_list())
 
+ll = LinkedList()
+for i in range(10):
+  ll.insert_beginning(i)
+
+print(ll.stringify_list())
+aux.swap_nodes(aux, ll, 3, 6)
+print(ll.stringify_list())
 #---------------------
 # #Doubly linked lists
 #---------------------
