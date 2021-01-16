@@ -1,17 +1,18 @@
 # Linear data structures implementation in Python
 
-#Define helper superclass
-class aux:
-    def tl(arr):
-        return arr[1:]
-    
-    def hd(arr):
-        return arr[0]
-    
-    def curry(f):
-        curried = lambda x: lambda y: f(x, y)
-        return curried
-    
+#Helper functions:
+def tl(arr):
+    return arr[1:]
+
+def hd(arr):
+    return arr[0]
+
+def curry(f):
+    curried = lambda x: lambda y: f(x, y)
+    return curried
+
+
+class dops: #Class contain data operations
     def getNodesVals(self, node, acc):
         acc.append(str(node.get_value()))
         next_node = node.get_next_node()
@@ -62,20 +63,90 @@ class aux:
             node1.set_next_node(node2.get_next_node())
             node2.set_next_node(temp)
             
-    def linear_search(self, search_list, target_value):
+    def linear_search(search_list, target_value):
+        matches = []
         def f(lst, i):
-            if self.hd(lst) == target_value:
-                return i
+            if i == len(search_list):
+                return
+            elif hd(lst) == target_value:
+                matches.append(i)
+                f(tl(lst), i+1)
             else:
-                return f(self.tl(lst), i+1)
-        try:
-            ans = f(search_list, 0)
-        except:
-            ans = "{0} not in list".format(target_value)
-        return ans
+                f(tl(lst), i+1)
+        f(search_list, 0)
+        if matches:
+            return matches
+        else:
+            raise ValueError("{0} not in list".format(target_value))
+        
+    def binary_search(self, sorted_list, left_pointer, right_pointer, target):
+        if left_pointer >= right_pointer: # indicate we've reached an empty "sub-list"
+            return "value not found"
+        mid_idx = (left_pointer + right_pointer) // 2
+        mid_val = sorted_list[mid_idx]
+        if mid_val == target:
+            return mid_idx
+        elif mid_val > target: # we reduce the sub-list by passing in a new right_pointer
+            return self.binary_search(self, sorted_list, left_pointer, mid_idx, target)
+        else: # we reduce the sub-list by passing in a new left_pointer
+            return self.binary_search(self, sorted_list, mid_idx + 1, right_pointer, target)
+        
+    def binary_search_iterative(sorted_list, target):
+        left_pointer = 0
+        right_pointer = len(sorted_list)
+        while left_pointer < right_pointer:
+            mid_idx = (left_pointer+right_pointer)//2
+            mid_val = sorted_list[mid_idx]
+            if mid_val == target:
+                return mid_idx
+            if target < mid_val:
+                right_pointer = mid_idx
+            if target > mid_val:
+                left_pointer = mid_idx + 1
+        return "Value not in list"
+    
+    def sparse_search(data, search_val):
+        print("Data: " + str(data))
+        print("Search Value: " + str(search_val))
+        first, last = 0, len(data) - 1
+        while first <= last:
+            mid = (first+last) // 2
+            if not data[mid]:
+                left, right = mid - 1, mid + 1
+                while True:
+                    if left < first and right > last:
+                        print('{0} is not in the dataset'.format(search_val))
+                        return
+                    elif right <= last and data[right]:
+                        mid = right
+                        break
+                    elif left >= first and data[left]:
+                        mid = left
+                        break
+                    right +=1
+                    left -= 1
+            if data[mid] == search_val:
+                print('{0} found at position {1}'.format(search_val, mid))
+                return
+            elif search_val < data[mid]:
+                last = mid - 1
+            elif search_val > data[mid]:
+                first = mid + 1
+        print('%s is not in the dataset' % search_val)
+
+#Testing binary_search
+#values = [77, 80, 102, 123, 288, 300, 540]
+#start_of_values = 0
+#end_of_values = len(values)
+#result = aux.binary_search(aux, values, start_of_values, end_of_values, 288)
+#print("element {0} is located at index {1}".format(288, result))
+
+#Testing sparse_search
+dops.sparse_search(["Alex", "", "", "", "", "Devan", "", "", "Elise", "", "", "", "Gary", "", "", "Mimi", "", "", "Parth", "", "", "", "Zachary"], "Parh")
 
 
-# Nodes 
+
+# Classes of data structures:
 class Node:
     def __init__(self, value, next_node=None):
         self.value = value
@@ -91,7 +162,7 @@ class Node:
         self.next_node = next_node
 
 
-class LinkedList(aux):
+class LinkedList(dops):
     def __init__(self, value=None):
         self.head_node = Node(value)
   
@@ -110,19 +181,20 @@ class LinkedList(aux):
 
 
 # Test
-ll = LinkedList(5)
-ll.insert_beginning(70)
-ll.insert_beginning(5675)
-ll.insert_beginning(90)
-print(ll.stringify_list())
+#ll = LinkedList(5)
+#ll.insert_beginning(70)
+#ll.insert_beginning(5675)
+#ll.insert_beginning(90)
+#print(ll.stringify_list())
 
-ll = LinkedList()
-for i in range(10):
-  ll.insert_beginning(i)
+#ll = LinkedList()
+#for i in range(10):
+#  ll.insert_beginning(i)
 
-print(ll.stringify_list())
-aux.swap_nodes(aux, ll, 3, 6)
-print(ll.stringify_list())
+#print(ll.stringify_list())
+#aux.swap_nodes(aux, ll, 3, 6)
+#print(ll.stringify_list())
+
 #---------------------
 # #Doubly linked lists
 #---------------------
@@ -228,4 +300,15 @@ class DoublyLinkedList:
             else:
                 current_node = current_node.get_next_node()
         return string_list
-    
+
+#tour_locations = [ "New York City", "Los Angeles", "Bangkok", "Istanbul", "London", "New York City", "Toronto"]
+#target_city = "New York City"
+#tour_stops = aux.linear_search(tour_locations, target_city)
+#print(tour_stops)
+
+# test cases
+#print(aux.binary_search_iterative([5,6,7,8,9], 9))
+#print(aux.binary_search_iterative([5,6,7,8,9], 10))
+#print(aux.binary_search_iterative([5,6,7,8,9], 8))
+#print(aux.binary_search_iterative([5,6,7,8,9], 4))
+#print(aux.binary_search_iterative([5,6,7,8,9], 6))
