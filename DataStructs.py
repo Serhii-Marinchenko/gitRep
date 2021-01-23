@@ -23,7 +23,6 @@ class Dops: #Class contain data operations
         
     def swap_nodes(self, input_list, val1, val2):
         print(f'Swapping {val1} with {val2}')
-        
         node1_prev = None
         node2_prev = None
         node1 = input_list.head_node
@@ -138,11 +137,11 @@ class Dops: #Class contain data operations
 #values = [77, 80, 102, 123, 288, 300, 540]
 #start_of_values = 0
 #end_of_values = len(values)
-#result = aux.binary_search(aux, values, start_of_values, end_of_values, 288)
+#result = Dops.binary_search(Dops, values, start_of_values, end_of_values, 288)
 #print("element {0} is located at index {1}".format(288, result))
 
 #Testing sparse_search
-#Dops.sparse_search(["Alex", "", "", "", "", "Devan", "", "", "Elise", "", "", "", "Gary", "", "", "Mimi", "", "", "Parth", "", "", "", "Zachary"], "Parh")
+#Dops.sparse_search(["Alex", "", "", "", "", "Devan", "", "", "Elise", "", "", "", "Gary", "", "", "Mimi", "", "", "Parth", "", "", "", "Zachary"], "Parth")
 
 
 
@@ -367,9 +366,9 @@ class Queue:
 
 
 #Uncomment to test
-print("Creating a deli line with up to 10 orders...\n------------")
-deli_line = Queue(10)
-print("Adding orders to our deli line...\n------------")
+#print("Creating a deli line with up to 10 orders...\n------------")
+#deli_line = Queue(10)
+#print("Adding orders to our deli line...\n------------")
 #deli_line.enqueue("egg and cheese on a roll")
 #deli_line.enqueue("bacon, egg, and cheese on a roll")
 #deli_line.enqueue("toasted sesame bagel with butter and jelly")
@@ -439,3 +438,147 @@ class Stack:
 #print("The first pizza to deliver is " + pizza_stack.peek())
 #for i in range(7):
 #    pizza_stack.pop()
+
+
+#---------------------
+#Hash Maps
+#---------------------
+
+class HashMap:
+    def __init__(self, array_size):
+        self.array_size = array_size
+        self.array = [None for i in range(self.array_size)]
+    
+    def hash(self, key, count_collisions=0):
+        key_bytes = key.encode()
+        hash_code = sum(key_bytes)
+        return hash_code + count_collisions
+    
+    def compressor(self, hash_code):
+        return hash_code % self.array_size
+    
+    def assign(self, key, value):
+        array_index = self.compressor(self.hash(key))
+        current_array_value = self.array[array_index]
+        if not current_array_value:
+            self.array[array_index] = [key, value]
+        elif current_array_value[0] == key:
+            current_array_value = value
+        else:
+            number_collisions = 1
+            while current_array_value[0] != key:
+                new_hash_code = self.hash(key, number_collisions)
+                new_array_index = self.compressor(new_hash_code)
+                current_array_value = self.array[new_array_index]
+                if not current_array_value:
+                    self.array[new_array_index] = [key, value]
+                    return
+                if current_array_value[0] == key:
+                    current_array_value[1] = value
+                    return
+                number_collisions +=1
+                
+    
+    def retrieve(self, key):
+        array_index = self.compressor(self.hash(key))
+        possible_return_value = self.array[array_index]
+        if not possible_return_value:
+            return None
+        if possible_return_value[0] == key:
+            return possible_return_value[1]
+        retrieval_collisions = 1
+        while possible_return_value[0] != key:
+            new_hash_code = self.hash(key, retrieval_collisions)
+            retrieving_array_index = self.compressor(new_hash_code)
+            possible_return_value = self.array[retrieving_array_index]
+            if not possible_return_value:
+                return None
+            retrieval_collisions += 1
+        return possible_return_value[1]
+
+#hash_map = HashMap(15)
+#hash_map.assign("gabbro", "igneous")
+#hash_map.assign("sandstone", "sedimentary")
+#hash_map.assign("gnesis", "metamorphic")
+#print(hash_map.retrieve("gabbro"))
+#print(hash_map.retrieve("sandstone"))
+#print(hash_map.retrieve("gnesis"))
+
+
+#---------------------
+#Trees
+#---------------------
+
+
+class TreeNode: #Modified node to represent a tree
+    def __init__(self, value):
+        self.value = value # data
+        self.children = [] # references to other nodes
+    
+    def add_child(self, child_node):
+        print("Adding " + child_node.value)
+        self.children.append(child_node) 
+    
+    def remove_child(self, child_node):
+        print("Removing " + child_node.value + " from " + self.value)
+        self.children = [child for child in self.children 
+                         if child is not child_node]
+        
+    def traverse(self):
+        nodes_to_visit = [self]
+        while len(nodes_to_visit) > 0:
+            current_node = nodes_to_visit.pop()
+            print(current_node.value)
+            nodes_to_visit += current_node.children
+
+import random
+
+class BinarySearchTree:
+    def __init__(self, value, depth=1):
+        self.value = value
+        self.depth = depth
+        self.left = None
+        self.right = None
+    
+    def insert(self, value):
+        if (value < self.value):
+            if (self.left is None):
+                self.left = BinarySearchTree(value, self.depth + 1)
+                print(f'Tree node {value} added to the left of {self.value} at depth {self.depth + 1}')
+            else:
+                self.left.insert(value)
+        else:
+            if (self.right is None):
+                self.right = BinarySearchTree(value, self.depth + 1)
+                print(f'Tree node {value} added to the right of {self.value} at depth {self.depth + 1}')
+            else:
+                self.right.insert(value)
+    
+    def get_node_by_value(self, value):
+        if (self.value == value):
+            return self
+        if ((self.left is not None) and (value < self.value)):
+            return self.left.get_node_by_value(value)
+        if (self.right is not None):# and (value >= self.value)):
+            return self.right.get_node_by_value(value)
+        return None
+  
+    def depth_first_traversal(self):
+        if (self.left is not None):
+            self.left.depth_first_traversal()
+            print(f'Depth={self.depth}, Value={self.value}')
+        if (self.right is not None):
+            self.right.depth_first_traversal()
+
+
+print("Creating Binary Search Tree rooted at value 15:")
+tree = BinarySearchTree(15)
+
+for x in range(10):
+  tree.insert(random.randint(0, 100))
+  
+print("Printing the inorder depth-first traversal:")
+tree.depth_first_traversal()
+
+tree.insert(50)
+tree.get_node_by_value(50)
