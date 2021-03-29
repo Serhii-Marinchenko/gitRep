@@ -34,8 +34,9 @@
 ;3-й крок
 (define µa (mean (Monte-Carlo 10000 ra resemple))) ;математичне сподівання облігацій виду А
 (define µb (mean (Monte-Carlo 10000 rb resemple))) ;математичне сподівання облігацій виду Б
-(define σa (stddev (Monte-Carlo 10000 ra resemple)));стандартне відхилення облігацій виду А
-(define σb (stddev (Monte-Carlo 10000 rb resemple)));стандартне відхилення облігацій виду Б
+(define σa (* (sqrt 20) (stddev (Monte-Carlo 10000 ra resemple))));стандартне відхилення облігацій виду А
+(define σb (* (sqrt 20) (stddev (Monte-Carlo 10000 rb resemple))));стандартне відхилення облігацій виду Б
+
 ; Крок 4, 5 та 6
 (define (simulation-with-accuracy i la lb)
   (letrec ([z-randoms (lambda () (sample (normal-dist 0 1) i))]
@@ -45,8 +46,7 @@
            [z-ra (transform-z-to-r µa σa)]
            [z-rb (transform-z-to-r µb σb)]
            [map (lambda (arr f) (cond [(null? arr) null]
-                                      [#t (cons (f (car arr))
-                                                (map (cdr arr) f))]))]
+                                      [#t (cons (f (car arr)) (map (cdr arr) f))]))]
            [est-ra (map (z-randoms) z-ra)]
            [est-rb (map (z-randoms) z-rb)]
            [zip (lambda (arr1 arr2)
@@ -69,16 +69,15 @@
                              [#t (if (< (random) lb)
                                      (begin
                                        (set! memo(cons (car arr-rb) memo))
-                                       (accuracy
-                                        (cdr arr-bool) (cdr arr-ra) (cdr arr-rb) la lb))
+                                       (accuracy (cdr arr-bool) (cdr arr-ra) (cdr arr-rb) la lb))
                                      (begin
                                        (set! memo (cons (car arr-ra) memo))
                                        (accuracy (cdr arr-bool) (cdr arr-ra) (cdr arr-rb) la lb)))]))]
            [returns (accuracy (stateA? est-ra-rb) est-ra est-rb la lb)])
-    (mean returns)))
+    (list (mean est-ra) (mean rb) (mean returns))))
 
-;uncomment to run the programm
-;(simulation-with-accuracy 10000 0.9 0.8)
+
+(simulation-with-accuracy 10000 0.9 0.8)
            
 
 
