@@ -74,20 +74,7 @@
                                        (set! memo (cons (car arr-ra) memo))
                                        (accuracy (cdr arr-bool) (cdr arr-ra) (cdr arr-rb) la lb)))]))]
            [returns (accuracy (stateA? est-ra-rb) est-ra est-rb la lb)])
-    (list (mean est-ra) (mean rb) (mean returns))))
+    (list (mean est-ra) (mean est-rb) (mean returns))))
 
 
 (simulation-with-accuracy 10000 0.9 0.8)
-           
-
-
-
-
-
-
-
-
-
-
-
-
